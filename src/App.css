@@ -19,30 +19,36 @@
 .sidebar {
   background-color: #2B2C37;
   color: #828FA3;
-  padding: 1rem 0;
   border-right: 0.063rem solid #3e3f4e;
-  width: 12.5rem;
+  width: 15.625rem;
   height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 1rem;
+  gap: 2rem;
 }
 
 .boards-list {
   display: block;
-  text-decoration: none;
-  margin-bottom: 1rem;
-  background-color: lime;
 }
 
 a {
   display: flex;
   text-decoration: none;
-
+  gap: 1rem;
+  font-size: 0.988rem;
+  align-items: center;
+  padding: 0.5rem 1rem;
 }
 
 .boards-list:hover {
   background-color: green;
 }
-
-.theme-wrapper {
+.theme-wrapper{
+ 
+}
+.sidebar-btn {
   display: flex;
   border-radius: 0.5rem;
   gap: 1rem;
@@ -51,15 +57,28 @@ a {
   margin: 0rem auto;
   width: calc(100% - 2rem);
   padding: 0.5rem 1rem;
+  margin: 0 1rem;
 }
-
+.hide-sidebar{
+  display: flex;
+  padding: 1rem 1rem 0.5rem 1rem;
+  color: #828FA3;
+  font-weight: 700;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.938rem;
+  cursor: pointer;
+}
+  
 .light,
 .dark {
   height: 100%;
 }
-.right-div{
+
+.right-div {
   width: 100%;
 }
+
 .header {
   background-color: #2B2C37;
   color: #828FA3;
@@ -70,7 +89,7 @@ a {
   align-items: center;
   justify-content: space-between;
   border-bottom: 0.063rem solid #3e3f4e;
-  }
+}
 
 .header-btn {
   background-color: #635FC7;
@@ -83,7 +102,8 @@ a {
   text-transform: capitalize;
   border: none;
 }
-main{
+
+main {
   background-color: #2b2c37;
   color: white;
   height: 80vh;

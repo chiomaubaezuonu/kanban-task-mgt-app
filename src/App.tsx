@@ -24,12 +24,14 @@ interface Projects {
 }
 
 interface ProjectData {
-  projectName: string 
+  projectName: string,
+  projectStatus: string
 }
 function App() {
   const [projects, setProjects] = useState<Projects[]>([])
   const [projectData, setProjectData] = useState<ProjectData>({
-    projectName: "Platform Launch"
+    projectName: "Platform Launch",
+    projectStatus: ""
   })
 
   const onChange = (checked: boolean) => {
@@ -44,17 +46,19 @@ function App() {
       })
   }, [])
 
-  const handleSelectedProject = (selectedProjectName:any) => {
+  const handleSelectedProject = (selectedProjectName: any) => {
     if (projects) {
       const projectName = projects.find(project => selectedProjectName === project.name)
-      setProjectData({...projectData, projectName: projectName?.name || ""})
+      setProjectData({ ...projectData, projectName: projectName?.name || "" })
     }
   }
 
   useEffect(() => {
-   setProjectData({...projectData, projectName:"Platform Launch"})
-  }, [])
+    setProjectData({ ...projectData, projectName: "Platform Launch" })
+    console.log(projects.flatMap(project => project.columns.map(column => column.name)))
+  }, [projects])
 
+  // console.log(projects.map(project => project.columns.map(column => column.name)))
   return (
     <div className="container">
       <div className='sidebar'>
@@ -68,25 +72,33 @@ function App() {
             {projects &&
               projects.map((project) => {
                 return <div key={project._id} onClick={() => handleSelectedProject(project.name)} className='boards-list'>
-                  {/* <a href=""> */}
-                  <img src="/images/viewIcon.png" alt="view board" />
-                  <p>{project.name}</p>
-                  {/* </a> */}
+                  <a href="">
+                    <img src="/images/sidebarIcon.svg" alt="view board" />
+                    <p>{project.name}</p>
+                  </a>
                 </div>
               })
             }
             < div className='new-board'>
-              <img src="/images/viewIcon.png" alt="view board" />
+              <img src="/images/sidebarIcon.svg" alt="view board" />
               <p>+ Create New Board</p>
             </div>
           </div>
         </div>
-        <div className="theme-wrapper">
-          <img src="/images/light-theme.svg" alt="light-theme" className='light' />
-          <Switch defaultChecked onChange={onChange} />
-          <img src="/images/dark-theme.svg" alt="dark-theme" className='dark' />
+
+        <div className='theme-wrapper' >
+          <div className="sidebar-btn">
+            <img src="/images/light-theme.svg" alt="light-theme" className='light' />
+            <Switch defaultChecked onChange={onChange} />
+            <img src="/images/dark-theme.svg" alt="dark-theme" className='dark' />
+          </div>
+          <div className="hide-sidebar">
+            <img src="/images/hide-icon.svg" alt="hide sidebar icon" />
+            <p>Hide Sidebar</p>
+          </div>
         </div>
       </div>
+
       <div className='right-div'>
         <header className="header">
           <h1>{projectData.projectName}</h1>
