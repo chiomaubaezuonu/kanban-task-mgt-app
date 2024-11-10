@@ -108,3 +108,14 @@ main {
   color: white;
   height: 80vh;
 }
+.hidden-sidebar{
+  background-color: #635FC7;
+  border-radius: 0 6.25rem 6.25rem 0;
+  padding: .7rem 1rem;
+  position: fixed;
+  bottom: 1.25rem;
+  z-index: 1;
+  cursor: pointer;
+  border: none;
+  /* all: unset; */
+}

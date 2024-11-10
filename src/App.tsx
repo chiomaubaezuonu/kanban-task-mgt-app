@@ -34,6 +34,8 @@ function App() {
     projectStatus: ""
   })
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
   };
@@ -59,45 +61,50 @@ function App() {
   }, [projects])
 
   // console.log(projects.map(project => project.columns.map(column => column.name)))
+  console.log(isSidebarOpen)
   return (
     <div className="container">
-      <div className='sidebar'>
-        <div className='nav-list'>
-          <div className="logo">
-            <img src="/images/logo-light.svg" alt="logo" />
-          </div>
+      {isSidebarOpen &&
+        <div className='sidebar'>
+          <div className='nav-list'>
+            <div className="logo">
+              <img src="/images/logo-light.svg" alt="logo" />
+            </div>
 
-          <div className="all-boards">
-            <p>{`All boards (${projects.length})`}</p>
-            {projects &&
-              projects.map((project) => {
-                return <div key={project._id} onClick={() => handleSelectedProject(project.name)} className='boards-list'>
-                  <a href="">
-                    <img src="/images/sidebarIcon.svg" alt="view board" />
-                    <p>{project.name}</p>
-                  </a>
-                </div>
-              })
-            }
-            < div className='new-board'>
-              <img src="/images/sidebarIcon.svg" alt="view board" />
-              <p>+ Create New Board</p>
+            <div className="all-boards">
+              <p>{`All boards (${projects.length})`}</p>
+              {projects &&
+                projects.map((project) => {
+                  return <div key={project._id} onClick={() => handleSelectedProject(project.name)} className='boards-list'>
+                    <a href="">
+                      <img src="/images/sidebarIcon.svg" alt="view board" />
+                      <p>{project.name}</p>
+                    </a>
+                  </div>
+                })
+              }
+              < div className='new-board'>
+                <img src="/images/sidebarIcon.svg" alt="view board" />
+                <p>+ Create New Board</p>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className='theme-wrapper' >
-          <div className="sidebar-btn">
-            <img src="/images/light-theme.svg" alt="light-theme" className='light' />
-            <Switch defaultChecked onChange={onChange} />
-            <img src="/images/dark-theme.svg" alt="dark-theme" className='dark' />
-          </div>
-          <div className="hide-sidebar">
-            <img src="/images/hide-icon.svg" alt="hide sidebar icon" />
-            <p>Hide Sidebar</p>
-          </div>
+          {isSidebarOpen &&
+            <div className='theme-wrapper' >
+              <div className="sidebar-btn">
+                <img src="/images/light-theme.svg" alt="light-theme" className='light' />
+                <Switch defaultChecked onChange={onChange} />
+                <img src="/images/dark-theme.svg" alt="dark-theme" className='dark' />
+              </div>
+              <div className="hide-sidebar" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+                <img src="/images/hide-icon.svg" alt="hide sidebar icon" />
+                <p>Hide Sidebar</p>
+              </div>
+            </div>
+          }
         </div>
-      </div>
+      }
 
       <div className='right-div'>
         <header className="header">
@@ -108,7 +115,12 @@ function App() {
           <div className='status'>
             <p >{projects && projects.map(project => project.columns.map(column => column.name))}</p>
           </div>
+          {!isSidebarOpen &&
+            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className='hidden-sidebar'>
+              <img src="/images/show-sidebar.svg" alt="show-icon" />
+            </button>}
         </main>
+
       </div>
     </div>
   );
