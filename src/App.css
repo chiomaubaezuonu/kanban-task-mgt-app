@@ -20,7 +20,8 @@
   background-color: #2B2C37;
   color: #828FA3;
   border-right: 0.063rem solid #3e3f4e;
-  width: 15.625rem;
+  /* width: 15.625rem; */
+  width: 19.3rem;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -31,23 +32,53 @@
 
 .boards-list {
   display: block;
+  width: 90%;
+  border-top-right-radius: 6.25rem;
+  border-bottom-right-radius: 6.25rem;
+  cursor: pointer;
 }
 
-a {
+.boards-list.selected-board {
+  background-color: #635FC7;
+  color: white;
+}
+
+.single-board{
   display: flex;
   text-decoration: none;
   gap: 1rem;
-  font-size: 0.988rem;
+  font-size: 0.938rem;
   align-items: center;
   padding: 0.5rem 1rem;
+  color: #828FA3;
+  /* all: unset; */
+  font-weight: 700;
+
 }
 
 .boards-list:hover {
-  background-color: green;
+  background-color: white;
 }
-.theme-wrapper{
- 
+
+.single-board:hover {
+  color: #635fc7;
 }
+
+.new-board {
+  display: flex;
+  color: #635fc7;
+  padding: .5rem 1rem;
+  gap: 1rem;
+  font-weight: 700;
+  font-size: 0.938rem;
+  width: 90%;
+  border-top-right-radius: 6.25rem;
+  border-bottom-right-radius: 6.25rem;
+  cursor: pointer;
+}
+
+.theme-wrapper {}
+
 .sidebar-btn {
   display: flex;
   border-radius: 0.5rem;
@@ -59,7 +90,8 @@ a {
   padding: 0.5rem 1rem;
   margin: 0 1rem;
 }
-.hide-sidebar{
+
+.hide-sidebar {
   display: flex;
   padding: 1rem 1rem 0.5rem 1rem;
   color: #828FA3;
@@ -69,7 +101,7 @@ a {
   font-size: 0.938rem;
   cursor: pointer;
 }
-  
+
 .light,
 .dark {
   height: 100%;
@@ -82,13 +114,15 @@ a {
 .header {
   background-color: #2B2C37;
   color: #828FA3;
-  padding: 1rem 0;
+  padding: 1rem;
   border-right: 0.063rem solid #3e3f4e;
   height: 20vh;
   display: flex;
   align-items: center;
   justify-content: space-between;
   border-bottom: 0.063rem solid #3e3f4e;
+  position: relative;
+  z-index: 10;
 }
 
 .header-btn {
@@ -102,13 +136,42 @@ a {
   text-transform: capitalize;
   border: none;
 }
+.headerModal{
+  position: absolute;
+  top: 6rem;
+  z-index: 20;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 0.75rem #0000001a;
+  background-color: #2b2c37;
+  gap: .5rem;
+  padding: .8rem 1rem;
+  width: 200px;
+  right: 1rem;
+}
+.headerModal p{
+  font-weight: 700;
+    font-size: 0.813rem;
+    padding: .4rem 0;
+    
+}
+.menu-div{
+  display: flex;
+  gap: 1rem;
+  color: #000000;
+}
+.menu-icon {
+  margin: auto 0;
+  height: 1.625rem;
+  cursor: pointer;
+}
 
 main {
   background-color: #2b2c37;
   color: white;
   height: 80vh;
 }
-.hidden-sidebar{
+
+.hidden-sidebar {
   background-color: #635FC7;
   border-radius: 0 6.25rem 6.25rem 0;
   padding: .7rem 1rem;

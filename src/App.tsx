@@ -35,6 +35,7 @@ function App() {
   })
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [headerModal, setHeaderModal] = useState(false)
 
   const onChange = (checked: boolean) => {
     console.log(`switch to ${checked}`);
@@ -50,18 +51,19 @@ function App() {
 
   const handleSelectedProject = (selectedProjectName: any) => {
     if (projects) {
-      const projectName = projects.find(project => selectedProjectName === project.name)
-      setProjectData({ ...projectData, projectName: projectName?.name || "" })
+      const newProjectName = projects.find(project => selectedProjectName === project.name)
+      console.log(newProjectName)
+      setProjectData({ ...projectData, projectName: newProjectName?.name || "" })
     }
   }
 
   useEffect(() => {
-    setProjectData({ ...projectData, projectName: "Platform Launch" })
-    console.log(projects.flatMap(project => project.columns.map(column => column.name)))
+    // setProjectData({ ...projectData, projectName: "Platform Launch" })
+    console.log(projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : ""))
+    //console.log(projects.flatMap(project => project.columns.map(column => column.name)))
   }, [projects])
 
-  // console.log(projects.map(project => project.columns.map(column => column.name)))
-  console.log(isSidebarOpen)
+
   return (
     <div className="container">
       {isSidebarOpen &&
@@ -75,11 +77,11 @@ function App() {
               <p>{`All boards (${projects.length})`}</p>
               {projects &&
                 projects.map((project) => {
-                  return <div key={project._id} onClick={() => handleSelectedProject(project.name)} className='boards-list'>
-                    <a href="">
+                  return <div key={project._id} onClick={() => handleSelectedProject(project.name)} className={`boards-list ${projectData.projectName === project.name ? 'selected-board' : ''}`}>
+                    <div className='single-board'>
                       <img src="/images/sidebarIcon.svg" alt="view board" />
                       <p>{project.name}</p>
-                    </a>
+                    </div>
                   </div>
                 })
               }
@@ -97,7 +99,7 @@ function App() {
                 <Switch defaultChecked onChange={onChange} />
                 <img src="/images/dark-theme.svg" alt="dark-theme" className='dark' />
               </div>
-              <div className="hide-sidebar" onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+              <div className="hide-sidebar" onClick={() => setIsSidebarOpen(false)}>
                 <img src="/images/hide-icon.svg" alt="hide sidebar icon" />
                 <p>Hide Sidebar</p>
               </div>
@@ -109,14 +111,23 @@ function App() {
       <div className='right-div'>
         <header className="header">
           <h1>{projectData.projectName}</h1>
-          <button className='header-btn'>+ Add New Task</button>
+          <div className='menu-div'>
+            <button className='header-btn'>+ Add New Task</button>
+            <img src="images/menu-icon.svg" alt="menu-icon" className='menu-icon' onClick={() => setHeaderModal(!headerModal)} />
+          </div>
         </header>
+        {headerModal &&
+          <div className='headerModal'>
+            <p style={{ color: '#828FA3' }}>Edit Board</p>
+            <p style={{ color: '#EA5555' }}>Delete Board</p>
+          </div>
+        }
         <main>
           <div className='status'>
-            <p >{projects && projects.map(project => project.columns.map(column => column.name))}</p>
+            <p>{projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : "")}</p>
           </div>
           {!isSidebarOpen &&
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className='hidden-sidebar'>
+            <button onClick={() => setIsSidebarOpen(true)} className='hidden-sidebar'>
               <img src="/images/show-sidebar.svg" alt="show-icon" />
             </button>}
         </main>
