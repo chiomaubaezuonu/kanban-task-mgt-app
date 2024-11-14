@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios'
-import { Switch } from 'antd';
+import { Switch, Card } from 'antd';
+import { title } from 'process';
 
 
 
@@ -25,20 +26,24 @@ interface Projects {
 
 interface ProjectData {
   projectName: string,
-  projectStatus: string
+  projectStatus: string,
+  colName: string[],
+  todoTitles: string[]
 }
 function App() {
   const [projects, setProjects] = useState<Projects[]>([])
   const [projectData, setProjectData] = useState<ProjectData>({
     projectName: "Platform Launch",
-    projectStatus: ""
+    projectStatus: "",
+    colName: [],
+    todoTitles: []
   })
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [headerModal, setHeaderModal] = useState(false)
 
   const onChange = (checked: boolean) => {
-    console.log(`switch to ${checked}`);
+    //console.log(`switch to ${checked}`);
   };
 
   useEffect(() => {
@@ -52,16 +57,24 @@ function App() {
   const handleSelectedProject = (selectedProjectName: any) => {
     if (projects) {
       const newProjectName = projects.find(project => selectedProjectName === project.name)
-      console.log(newProjectName)
       setProjectData({ ...projectData, projectName: newProjectName?.name || "" })
     }
+    // if(projects){
+    //  const newProjectStatus = projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : "")
+    //   setProjectData({...projectData, projectStatus:newProjectStatus || "" })
+    // }
   }
+  // const selP = projects?.filter(project => project.name === projectData.projectName)
 
   useEffect(() => {
-    // setProjectData({ ...projectData, projectName: "Platform Launch" })
-    console.log(projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : ""))
-    //console.log(projects.flatMap(project => project.columns.map(column => column.name)))
-  }, [projects])
+    const selectedProject = projects?.find(project => project.name === projectData.projectName)
+    const column = selectedProject?.columns.find(col => col.name === "Todo")
+    const taskTitle = column ? column.tasks.map(task => task.title) : []
+    setProjectData({ ...projectData, todoTitles: taskTitle })
+    const subTasks = column?.tasks.find(task => task.subtasks)
+    console.log(subTasks)
+
+  }, [projectData.projectName])
 
 
   return (
@@ -81,6 +94,7 @@ function App() {
                     <div className='single-board'>
                       <img src="/images/sidebarIcon.svg" alt="view board" />
                       <p>{project.name}</p>
+
                     </div>
                   </div>
                 })
@@ -123,8 +137,14 @@ function App() {
           </div>
         }
         <main>
-          <div className='status'>
-            <p>{projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : "")}</p>
+          <div className='cards-container'>
+            <p>{projectData.colName}</p>
+            {projectData.todoTitles && projectData.todoTitles.map((title, index) => {
+              return <Card style={{ width: 248 }}>
+           <h2 className='cardTitle'>{title}</h2>
+              </Card>
+            })}
+
           </div>
           {!isSidebarOpen &&
             <button onClick={() => setIsSidebarOpen(true)} className='hidden-sidebar'>
