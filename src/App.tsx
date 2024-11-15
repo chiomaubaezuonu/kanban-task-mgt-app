@@ -2,11 +2,10 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios'
 import { Switch, Card } from 'antd';
-import { title } from 'process';
 
 
 
-interface Projects {
+interface AllBoards {
   boards: []
   _id: string,
   name: string,
@@ -25,18 +24,20 @@ interface Projects {
 }
 
 interface ProjectData {
-  projectName: string,
+  boardName: string,
   projectStatus: string,
   colName: string[],
-  todoTitles: string[]
+  todoTitles: string[],
+  subtasks: { title: string, isCompleted: Boolean }[]
 }
 function App() {
-  const [projects, setProjects] = useState<Projects[]>([])
-  const [projectData, setProjectData] = useState<ProjectData>({
-    projectName: "Platform Launch",
+  const [allBoards, setAllBoards] = useState<AllBoards[]>([])
+  const [selectedBoard, setSelectedBoard] = useState<ProjectData>({
+    boardName: "Platform Launch",
     projectStatus: "",
     colName: [],
-    todoTitles: []
+    todoTitles: [],
+    subtasks: []
   })
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
@@ -49,15 +50,15 @@ function App() {
   useEffect(() => {
     axios.get('https://kanban-task-server-7zl1.onrender.com/projects')
       .then(response => {
-        setProjects(response.data[0].boards || [])
+        setAllBoards(response.data[0].boards || [])
 
       })
   }, [])
 
-  const handleSelectedProject = (selectedProjectName: any) => {
-    if (projects) {
-      const newProjectName = projects.find(project => selectedProjectName === project.name)
-      setProjectData({ ...projectData, projectName: newProjectName?.name || "" })
+  const handleSelectedProject = (selectedBoardName: any) => {
+    if (allBoards) {
+      const newProjectName = allBoards.find(board => selectedBoardName === board.name)
+      setSelectedBoard({ ...selectedBoard, boardName: newProjectName?.name || "" })
     }
     // if(projects){
     //  const newProjectStatus = projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : "")
@@ -67,14 +68,14 @@ function App() {
   // const selP = projects?.filter(project => project.name === projectData.projectName)
 
   useEffect(() => {
-    const selectedProject = projects?.find(project => project.name === projectData.projectName)
+    const selectedProject = allBoards?.find(board => board.name === selectedBoard.boardName)
     const column = selectedProject?.columns.find(col => col.name === "Todo")
     const taskTitle = column ? column.tasks.map(task => task.title) : []
-    setProjectData({ ...projectData, todoTitles: taskTitle })
-    const subTasks = column?.tasks.find(task => task.subtasks)
-    console.log(subTasks)
-
-  }, [projectData.projectName])
+    // setProjectData({ ...projectData, todoTitles: taskTitle })
+    const subtasksArr = column ? column.tasks.map(task => task.subtasks).flat() : []
+    setSelectedBoard({ ...selectedBoard, subtasks: subtasksArr, todoTitles: taskTitle })
+    console.log(subtasksArr)
+  }, [selectedBoard.boardName])
 
 
   return (
@@ -87,13 +88,13 @@ function App() {
             </div>
 
             <div className="all-boards">
-              <p>{`All boards (${projects.length})`}</p>
-              {projects &&
-                projects.map((project) => {
-                  return <div key={project._id} onClick={() => handleSelectedProject(project.name)} className={`boards-list ${projectData.projectName === project.name ? 'selected-board' : ''}`}>
+              <p>{`All boards (${allBoards.length})`}</p>
+              {allBoards &&
+                allBoards.map((board) => {
+                  return <div key={board._id} onClick={() => handleSelectedProject(board.name)} className={`boards-list ${selectedBoard.boardName === board.name ? 'selected-board' : ''}`}>
                     <div className='single-board'>
                       <img src="/images/sidebarIcon.svg" alt="view board" />
-                      <p>{project.name}</p>
+                      <p>{board.name}</p>
 
                     </div>
                   </div>
@@ -124,7 +125,7 @@ function App() {
 
       <div className='right-div'>
         <header className="header">
-          <h1>{projectData.projectName}</h1>
+          <h1>{selectedBoard.boardName}</h1>
           <div className='menu-div'>
             <button className='header-btn'>+ Add New Task</button>
             <img src="images/menu-icon.svg" alt="menu-icon" className='menu-icon' onClick={() => setHeaderModal(!headerModal)} />
@@ -138,10 +139,11 @@ function App() {
         }
         <main>
           <div className='cards-container'>
-            <p>{projectData.colName}</p>
-            {projectData.todoTitles && projectData.todoTitles.map((title, index) => {
+            <p>{selectedBoard.colName}</p>
+            {selectedBoard.todoTitles && selectedBoard.todoTitles.map((title, index) => {
               return <Card style={{ width: 248 }}>
-           <h2 className='cardTitle'>{title}</h2>
+                <h2 className='cardTitle'>{title}</h2>
+                <p></p>
               </Card>
             })}
 
