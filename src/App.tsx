@@ -5,8 +5,25 @@ import { Switch, Card } from 'antd';
 
 
 
-interface AllBoards {
-  boards: []
+// interface AllBoards {
+//   boards: []
+//   _id: string,
+//   name: string,
+//   columns: [{
+//     name: string,
+//     tasks: [{
+//       title: string,
+//       description: string,
+//       status: string,
+//       subtasks: [{
+//         title: string,
+//         isCompleted: Boolean
+//       }]
+//     }],
+//   }]
+// }
+
+interface Board {
   _id: string,
   name: string,
   columns: [{
@@ -15,30 +32,13 @@ interface AllBoards {
       title: string,
       description: string,
       status: string,
-      subtasks: [{
-        title: string,
-        isCompleted: Boolean
-      }]
-    }],
+      subtask: [{ title: string, isCompleted: boolean }]
+    }]
   }]
 }
-
-interface ProjectData {
-  boardName: string,
-  projectStatus: string,
-  colName: string[],
-  todoTitles: string[],
-  subtasks: { title: string, isCompleted: Boolean }[]
-}
 function App() {
-  const [allBoards, setAllBoards] = useState<AllBoards[]>([])
-  const [selectedBoard, setSelectedBoard] = useState<ProjectData>({
-    boardName: "Platform Launch",
-    projectStatus: "",
-    colName: [],
-    todoTitles: [],
-    subtasks: []
-  })
+  const [allBoards, setAllBoards] = useState<Board[]>([])
+  const [selectedBoard, setSelectedBoard] = useState<Board | undefined>(undefined)
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [headerModal, setHeaderModal] = useState(false)
@@ -55,30 +55,11 @@ function App() {
       })
   }, [])
 
-  const handleSelectedProject = (selectedBoardName: any) => {
-    if (allBoards) {
-      const newProjectName = allBoards.find(board => selectedBoardName === board.name)
-      setSelectedBoard({ ...selectedBoard, boardName: newProjectName?.name || "" })
-    }
-    // if(projects){
-    //  const newProjectStatus = projects.map(project => project.name === projectData.projectName ? project.columns.flatMap(column => column.name) : "")
-    //   setProjectData({...projectData, projectStatus:newProjectStatus || "" })
-    // }
-  }
-  // const selP = projects?.filter(project => project.name === projectData.projectName)
-
-  useEffect(() => {
-    const selectedProject = allBoards?.find(board => board.name === selectedBoard.boardName)
-    const column = selectedProject?.columns.find(col => col.name === "Todo")
-    const taskTitle = column ? column.tasks.map(task => task.title) : []
-    // setProjectData({ ...projectData, todoTitles: taskTitle })
-    const subtasksArr = column ? column.tasks.map(task => task.subtasks).flat() : []
-    setSelectedBoard({ ...selectedBoard, subtasks: subtasksArr, todoTitles: taskTitle })
-    console.log(subtasksArr)
-  }, [selectedBoard.boardName])
-
+  
+console.log(allBoards)
 
   return (
+
     <div className="container">
       {isSidebarOpen &&
         <div className='sidebar'>
@@ -87,11 +68,11 @@ function App() {
               <img src="/images/logo-light.svg" alt="logo" />
             </div>
 
-            <div className="all-boards">
+            <div className="all-boards" style={{background:'powderBlue'}}>
               <p>{`All boards (${allBoards.length})`}</p>
               {allBoards &&
                 allBoards.map((board) => {
-                  return <div key={board._id} onClick={() => handleSelectedProject(board.name)} className={`boards-list ${selectedBoard.boardName === board.name ? 'selected-board' : ''}`}>
+                  return <div key={board.name} onClick={() => setSelectedBoard(board)} className={`boards-list ${"selectedBoard.boardName" === board.name ? 'selected-board' : ''}`}>
                     <div className='single-board'>
                       <img src="/images/sidebarIcon.svg" alt="view board" />
                       <p>{board.name}</p>
@@ -125,7 +106,7 @@ function App() {
 
       <div className='right-div'>
         <header className="header">
-          <h1>{selectedBoard.boardName}</h1>
+          <h1>{selectedBoard?.name}</h1>
           <div className='menu-div'>
             <button className='header-btn'>+ Add New Task</button>
             <img src="images/menu-icon.svg" alt="menu-icon" className='menu-icon' onClick={() => setHeaderModal(!headerModal)} />
@@ -139,13 +120,18 @@ function App() {
         }
         <main>
           <div className='cards-container'>
-            <p>{selectedBoard.colName}</p>
-            {selectedBoard.todoTitles && selectedBoard.todoTitles.map((title, index) => {
-              return <Card style={{ width: 248 }}>
-                <h2 className='cardTitle'>{title}</h2>
-                <p></p>
-              </Card>
-            })}
+            <div className='columns'>
+              {selectedBoard?.columns.map((column, index) => {
+                return <div key={index}>
+                  <p >{column.name}</p>
+                  {column.tasks?.map((task, taskIndex) => {
+                    return <Card style={{ width: 248 }} key={index}>
+                      <h2 className='cardTitle'>{task.title}</h2>
+                    </Card>
+                  })}
+                </div>
+              })}
+            </div>
 
           </div>
           {!isSidebarOpen &&

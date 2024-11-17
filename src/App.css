@@ -185,8 +185,14 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  width: 100%;
 }
-
+.columns{
+  width: 100%;
+  display: flex;
+  padding-right: 3rem;
+  justify-content: space-between;
+}
 
 .hidden-sidebar {
   background-color: #635FC7;
