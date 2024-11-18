@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios'
-import { Switch, Card } from 'antd';
+import { Switch, Card, Button, Modal, Input } from 'antd';
 
 
 
@@ -42,11 +42,26 @@ function App() {
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [headerModal, setHeaderModal] = useState(false)
+  const [numberOfColumn, setNumberOfColumn] = useState(0)
+  const [newColumn, setNewColumn] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const onChange = (checked: boolean) => {
     //console.log(`switch to ${checked}`);
   };
 
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const addColumn = () => {
+    setNumberOfColumn(numberOfColumn + 1)
+  };
+
+  const handleCancel = () => {
+   
+  };
   useEffect(() => {
     axios.get('https://kanban-task-server-7zl1.onrender.com/projects')
       .then(response => {
@@ -54,9 +69,11 @@ function App() {
 
       })
   }, [])
+  const removeColumn = () => {
+    setNewColumn(false)
+  }
 
-  
-console.log(allBoards)
+  console.log(allBoards)
 
   return (
 
@@ -68,7 +85,7 @@ console.log(allBoards)
               <img src="/images/logo-light.svg" alt="logo" />
             </div>
 
-            <div className="all-boards" style={{background:'powderBlue'}}>
+            <div className="all-boards">
               <p>{`All boards (${allBoards.length})`}</p>
               {allBoards &&
                 allBoards.map((board) => {
@@ -82,8 +99,11 @@ console.log(allBoards)
                 })
               }
               < div className='new-board'>
-                <img src="/images/sidebarIcon.svg" alt="view board" />
-                <p>+ Create New Board</p>
+                <img src="/images/sidebarIcon.svg" alt="view board" height={16} />
+                {/* <p>+ Create New Board</p> */}
+                <Button type="primary" onClick={showModal} ghost>
+                  + Create New Board
+                </Button>
               </div>
             </div>
           </div>
@@ -120,6 +140,28 @@ console.log(allBoards)
         }
         <main>
           <div className='cards-container'>
+            <Modal title="Basic Modal" open={isModalOpen} onOk={addColumn} onCancel={handleCancel} cancelText={"Add Columns"} okText={"Create Board"}>
+              <h2>Add New Board</h2>
+              <form action="">
+                <label htmlFor="">
+                  <p>Name</p>
+                  <Input placeholder="E.G Web Design" />
+                </label>
+                <div className="new-columns">
+                  <p onClick={removeColumn}>Columns</p>
+                  <div className='input-div'>
+                    <Input />
+                    <p onClick={removeColumn}>X</p>
+                  </div>
+                  <div className='input-div'>
+                    <Input />
+                    <p onClick={removeColumn}>X</p>
+                  </div>
+
+                </div>
+                {/* {numberOfColumn } */}
+              </form>
+            </Modal>
             <div className='columns'>
               {selectedBoard?.columns.map((column, index) => {
                 return <div key={index}>
@@ -138,6 +180,7 @@ console.log(allBoards)
             <button onClick={() => setIsSidebarOpen(true)} className='hidden-sidebar'>
               <img src="/images/show-sidebar.svg" alt="show-icon" />
             </button>}
+
         </main>
 
       </div>
