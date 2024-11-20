@@ -77,6 +77,9 @@
   cursor: pointer;
   align-items: center;
 }
+.new-columns{
+display: flex;
+}
 .ant-btn-variant-solid{
   width: 75%;
   background-color: #2B2C37;

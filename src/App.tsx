@@ -54,13 +54,11 @@ function App() {
     setIsModalOpen(true);
   };
 
-  const removeColumn = (i: number) => {
-    const updatedColumn = newColumn.filter((column: any, index: number) => index)
-    setNewColumn(updatedColumn)
+  const removeColumn = (columnIndex: number) => {
+    setNewColumn(newColumn.filter((column, index) => columnIndex !== index))
   }
 
   const addColumn = () => {
-    // setColumnCount(columnCount + 1)
     setNewColumn([...newColumn, ""])
 
   };
@@ -144,20 +142,20 @@ function App() {
         }
         <main>
           <div className='cards-container'>
-            <Modal title="Basic Modal" open={isModalOpen} onOk={addColumn} onCancel={handleCancel} cancelText={"Add Columns"} okText={"Create Board"}>
+            <Modal title="Basic Modal" open={isModalOpen} onOk={addColumn} onCancel={handleCancel} cancelText={"Create Board"} okText={"Add Columns"} >  
               <h2>Add New Board</h2>
               <form action="">
                 <label htmlFor="">
                   <p>Name</p>
                   <Input placeholder="E.G Web Design" />
                 </label>
-                <div className="new-columns">
+                <div>
                   {newColumn.map((newColumn, index) => {
-                    return <div key={index}>
+                    return <div key={index} className="new-columns">
                       <Input type='text' />
+                      <p onClick={() => removeColumn(index)} className='removeColumn'>X</p>
                     </div>
                   })}
-                  {/* {newColumn} */}
                 </div>
               </form>
             </Modal>
