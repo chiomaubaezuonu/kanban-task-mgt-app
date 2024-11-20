@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios'
-import { Switch, Card, Button, Modal, Input } from 'antd';
+import { Switch, Card, Button, Modal, Input, MenuProps, Dropdown, Space } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
+import TextArea from 'antd/es/input/TextArea';
 
 
 
@@ -40,10 +42,12 @@ function App() {
   const [allBoards, setAllBoards] = useState<Board[]>([])
   const [selectedBoard, setSelectedBoard] = useState<Board | undefined>(undefined)
   const [updatedColumnCount, setUpdatedColumnCount] = useState([]);
-  const [newColumn, setNewColumn] = useState<string[]>([""])
+  const [newInput, setNewInput] = useState<string[]>([""])
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [headerModal, setHeaderModal] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false)
+
 
 
   const onChange = (checked: boolean) => {
@@ -54,18 +58,18 @@ function App() {
     setIsModalOpen(true);
   };
 
-  const removeColumn = (columnIndex: number) => {
-    setNewColumn(newColumn.filter((column, index) => columnIndex !== index))
+  const removeColumn = (inputIndex: number) => {
+    setNewInput(newInput.filter((input, index) => inputIndex !== index))
   }
 
-  const addColumn = () => {
-    setNewColumn([...newColumn, ""])
+  const AddInput = () => {
+    setNewInput([...newInput, ""])
 
   };
 
   const handleCancel = () => {
     setIsModalOpen(false)
-
+    setIsNewTaskModalOpen(false)
   };
   useEffect(() => {
     axios.get('https://kanban-task-server-7zl1.onrender.com/projects')
@@ -130,10 +134,51 @@ function App() {
         <header className="header">
           <h1>{selectedBoard?.name}</h1>
           <div className='menu-div'>
-            <button className='header-btn'>+ Add New Task</button>
+            <button className='header-btn' onClick={() => setIsNewTaskModalOpen(true)}>+ Add New Task</button>
             <img src="images/menu-icon.svg" alt="menu-icon" className='menu-icon' onClick={() => setHeaderModal(!headerModal)} />
           </div>
         </header>
+
+        <Modal open={isNewTaskModalOpen} onCancel={handleCancel} footer={null}>
+          <h2>Add New Task</h2>
+          <form action="">
+            <label htmlFor="">
+              <p>Title</p>
+              <Input placeholder="E.G Table Coffee Break" />
+            </label>
+            <label htmlFor="">
+              <p>Description</p>
+              <TextArea placeholder="E.G It's Always Good to Take A Break. This 15 Minutes Break Will Recharge The Batteries A Little." />
+            </label>
+            <label htmlFor="">
+              <p>Subtasks</p>
+              <div className="subtasks-input">
+                {newInput.map((newColumn, index) => {
+                  return <div key={index} className="new-columns">
+                    <Input type='text' />
+                    <p onClick={() => removeColumn(index)} className='removeColumn'>X</p>
+                  </div>
+                })}
+              </div>
+            </label>
+            <Button type='primary' onClick={AddInput}>Add New Tasks </Button>
+            <label htmlFor="">
+              <p>Status</p>
+              <input />
+            </label>
+            <select>
+
+              <option value="fruit">Todo</option>
+
+              <option value="vegetable">Doing</option>
+
+              <option value="meat">Done</option>
+
+            </select>
+            <Button type='primary' onClick={AddInput}> Create Task </Button>
+          </form>
+        </Modal>
+
         {headerModal &&
           <div className='headerModal'>
             <p style={{ color: '#828FA3' }}>Edit Board</p>
@@ -142,7 +187,7 @@ function App() {
         }
         <main>
           <div className='cards-container'>
-            <Modal title="Basic Modal" open={isModalOpen} onOk={addColumn} onCancel={handleCancel} cancelText={"Create Board"} okText={"Add Columns"} >  
+            <Modal title="Basic Modal" open={isModalOpen} onOk={AddInput} onCancel={handleCancel} cancelText={"Create Board"} okText={"Add Columns"} >
               <h2>Add New Board</h2>
               <form action="">
                 <label htmlFor="">
@@ -150,7 +195,7 @@ function App() {
                   <Input placeholder="E.G Web Design" />
                 </label>
                 <div>
-                  {newColumn.map((newColumn, index) => {
+                  {newInput.map((newColumn, index) => {
                     return <div key={index} className="new-columns">
                       <Input type='text' />
                       <p onClick={() => removeColumn(index)} className='removeColumn'>X</p>
