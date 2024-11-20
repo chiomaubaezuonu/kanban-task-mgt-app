@@ -39,11 +39,10 @@ interface Board {
 function App() {
   const [allBoards, setAllBoards] = useState<Board[]>([])
   const [selectedBoard, setSelectedBoard] = useState<Board | undefined>(undefined)
-
+  const [updatedColumnCount, setUpdatedColumnCount] = useState([]);
+  const [newColumn, setNewColumn] = useState<string[]>([""])
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [headerModal, setHeaderModal] = useState(false)
-  const [numberOfColumn, setNumberOfColumn] = useState(0)
-  const [newColumn, setNewColumn] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false);
 
 
@@ -55,12 +54,20 @@ function App() {
     setIsModalOpen(true);
   };
 
+  const removeColumn = (i: number) => {
+    const updatedColumn = newColumn.filter((column: any, index: number) => index)
+    setNewColumn(updatedColumn)
+  }
+
   const addColumn = () => {
-    setNumberOfColumn(numberOfColumn + 1)
+    // setColumnCount(columnCount + 1)
+    setNewColumn([...newColumn, ""])
+
   };
 
   const handleCancel = () => {
-   
+    setIsModalOpen(false)
+
   };
   useEffect(() => {
     axios.get('https://kanban-task-server-7zl1.onrender.com/projects')
@@ -69,11 +76,9 @@ function App() {
 
       })
   }, [])
-  const removeColumn = () => {
-    setNewColumn(false)
-  }
 
-  console.log(allBoards)
+
+
 
   return (
 
@@ -100,7 +105,6 @@ function App() {
               }
               < div className='new-board'>
                 <img src="/images/sidebarIcon.svg" alt="view board" height={16} />
-                {/* <p>+ Create New Board</p> */}
                 <Button type="primary" onClick={showModal} ghost>
                   + Create New Board
                 </Button>
@@ -148,18 +152,13 @@ function App() {
                   <Input placeholder="E.G Web Design" />
                 </label>
                 <div className="new-columns">
-                  <p onClick={removeColumn}>Columns</p>
-                  <div className='input-div'>
-                    <Input />
-                    <p onClick={removeColumn}>X</p>
-                  </div>
-                  <div className='input-div'>
-                    <Input />
-                    <p onClick={removeColumn}>X</p>
-                  </div>
-
+                  {newColumn.map((newColumn, index) => {
+                    return <div key={index}>
+                      <Input type='text' />
+                    </div>
+                  })}
+                  {/* {newColumn} */}
                 </div>
-                {/* {numberOfColumn } */}
               </form>
             </Modal>
             <div className='columns'>

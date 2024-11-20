@@ -217,6 +217,10 @@ main {
   padding-right: 3rem;
   justify-content: space-between;
 }
+.removeColumn{
+  color: red;
+  cursor: pointer;
+}
 
 .hidden-sidebar {
   background-color: #635FC7;
