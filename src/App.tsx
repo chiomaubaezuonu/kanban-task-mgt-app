@@ -1,32 +1,12 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios'
-import { Switch, Card, Button, Modal, Input, MenuProps, Dropdown, Space } from 'antd';
-import { DownOutlined } from '@ant-design/icons';
+import { Switch, Card, Button, Modal, Input } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 
 
 
-// interface AllBoards {
-//   boards: []
-//   _id: string,
-//   name: string,
-//   columns: [{
-//     name: string,
-//     tasks: [{
-//       title: string,
-//       description: string,
-//       status: string,
-//       subtasks: [{
-//         title: string,
-//         isCompleted: Boolean
-//       }]
-//     }],
-//   }]
-// }
-
 interface Board {
-  _id: string,
   name: string,
   columns: [{
     name: string,
@@ -41,12 +21,14 @@ interface Board {
 function App() {
   const [allBoards, setAllBoards] = useState<Board[]>([])
   const [selectedBoard, setSelectedBoard] = useState<Board | undefined>(undefined)
-  const [updatedColumnCount, setUpdatedColumnCount] = useState([]);
   const [newInput, setNewInput] = useState<string[]>([""])
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
   const [headerModal, setHeaderModal] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false)
+  const [newBoard, setNewBoard] = useState({
+    name: ""
+  })
 
 
 
@@ -79,8 +61,22 @@ function App() {
       })
   }, [])
 
-
-
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (newBoard.name.trim() === "") {
+      return alert("Board name is required!");;
+    }
+    try {
+      const response = await axios.post("https://kanban-task-server-7zl1.onrender.com/projects",    { boards: [{ name: newBoard.name }] }) 
+      console.log("new board = ", response.data)
+      setNewBoard({ name: "" }); // Reset the form
+      alert("Board created successfully!");
+    }
+    catch (error) {
+      console.error("Error creating board:", error);
+      alert("Failed to create board. Please try again.");
+    }
+  }
 
   return (
 
@@ -153,9 +149,9 @@ function App() {
             <label htmlFor="">
               <p>Subtasks</p>
               <div className="subtasks-input">
-                {newInput.map((newColumn, index) => {
+                {newInput.map((input, index) => {
                   return <div key={index} className="new-columns">
-                    <Input type='text' />
+                    <input value={input} />
                     <p onClick={() => removeColumn(index)} className='removeColumn'>X</p>
                   </div>
                 })}
@@ -187,12 +183,12 @@ function App() {
         }
         <main>
           <div className='cards-container'>
-            <Modal title="Basic Modal" open={isModalOpen} onOk={AddInput} onCancel={handleCancel} cancelText={"Create Board"} okText={"Add Columns"} >
+            <Modal open={isModalOpen} onOk={AddInput} onCancel={handleCancel} cancelText={"Create Board"} okText={"Add Columns"} footer={null} >
               <h2>Add New Board</h2>
-              <form action="">
+              <form onSubmit={handleSubmit}>
                 <label htmlFor="">
                   <p>Name</p>
-                  <Input placeholder="E.G Web Design" />
+                  <Input placeholder="E.G Web Design" value={newBoard.name} onChange={(e) => setNewBoard({ ...newBoard, name: e.target.value })} required />
                 </label>
                 <div>
                   {newInput.map((newColumn, index) => {
@@ -202,6 +198,8 @@ function App() {
                     </div>
                   })}
                 </div>
+                <Button type='primary' onClick={AddInput}>Add Columns</Button>
+                <button type='submit'>Create Board </button>
               </form>
             </Modal>
             <div className='columns'>
