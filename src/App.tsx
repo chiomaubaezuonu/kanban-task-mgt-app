@@ -98,7 +98,7 @@ function App() {
     }
   };
 
-  console.log(newTask)
+  console.log(newTask.status)
 
   return (
     <div className="container">
@@ -236,12 +236,12 @@ function App() {
               <p>Status</p>
               <input />
             </label>
-            <select>
-              <option value="fruit">Todo</option>
+            <select onChange={(e) => setNewTask({...newTask, status:e.target.value})}>
+              <option value="Todo">Todo</option>
 
-              <option value="vegetable">Doing</option>
+              <option value="Doing">Doing</option>
 
-              <option value="meat">Done</option>
+              <option value="Done">Done</option>
             </select>
             <Button type="primary" >
               {" "}
