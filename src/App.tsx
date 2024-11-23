@@ -98,7 +98,10 @@ function App() {
     }
   };
 
-  console.log(newTask.status)
+  const handleNewTask = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log(newTask);
+  };
 
   return (
     <div className="container">
@@ -169,10 +172,14 @@ function App() {
 
         <Modal open={isNewTaskModalOpen} onCancel={handleCancel} footer={null}>
           <h2>Add New Task</h2>
-          <form action="">
+          <form onSubmit={handleNewTask}>
             <label htmlFor="">
               <p>Title</p>
-              <Input placeholder="E.G Table Coffee Break" />
+              <Input
+                placeholder="Enter New Task Title"
+                value={newTask.title}
+                onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+              />
             </label>
             <label htmlFor="">
               <p>Description</p>
@@ -236,17 +243,14 @@ function App() {
               <p>Status</p>
               <input />
             </label>
-            <select onChange={(e) => setNewTask({...newTask, status:e.target.value})}>
+            <select onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}>
               <option value="Todo">Todo</option>
 
               <option value="Doing">Doing</option>
 
               <option value="Done">Done</option>
             </select>
-            <Button type="primary" >
-              {" "}
-              Create Task{" "}
-            </Button>
+            <button type="submit">Create Task</button>
           </form>
         </Modal>
 
