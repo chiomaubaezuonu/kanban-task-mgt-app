@@ -214,6 +214,9 @@ main {
   gap: 1rem;
   width: 100%;
 }
+.ant-modal .ant-modal-close-x{
+  display: none;
+}
 .columns{
   width: 100%;
   display: flex;
@@ -224,7 +227,9 @@ main {
   color: red;
   cursor: pointer;
 }
-
+.submit-btn{
+  cursor: pointer;
+}
 .hidden-sidebar {
   background-color: #635FC7;
   border-radius: 0 6.25rem 6.25rem 0;

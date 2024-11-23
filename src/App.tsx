@@ -1,36 +1,46 @@
-import { useEffect, useState } from 'react';
-import './App.css';
-import axios from 'axios'
-import { Switch, Card, Button, Modal, Input } from 'antd';
-import TextArea from 'antd/es/input/TextArea';
+import { useEffect, useState } from "react";
+import "./App.css";
+import axios from "axios";
+import { Switch, Card, Button, Modal, Input } from "antd";
+import TextArea from "antd/es/input/TextArea";
 
-
+interface Task {
+  title: string;
+  description: string;
+  status: string;
+  subtasks: { title: string; isCompleted: boolean }[];
+}
 
 interface Board {
-  name: string,
-  columns: [{
-    name: string,
-    tasks: [{
-      title: string,
-      description: string,
-      status: string,
-      subtask: [{ title: string, isCompleted: boolean }]
-    }]
-  }]
+  name: string;
+  columns: {
+    name: string;
+    tasks: Task[];
+  }[];
 }
+
 function App() {
-  const [allBoards, setAllBoards] = useState<Board[]>([])
-  const [selectedBoard, setSelectedBoard] = useState<Board | undefined>(undefined)
-  const [newInput, setNewInput] = useState<string[]>([""])
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [headerModal, setHeaderModal] = useState(false)
+  const [allBoards, setAllBoards] = useState<Board[]>([]);
+  const [selectedBoard, setSelectedBoard] = useState<Board | undefined>(undefined);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [headerModal, setHeaderModal] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false)
-  const [newBoard, setNewBoard] = useState({
-    name: ""
-  })
-
-
+  const [isNewTaskModalOpen, setIsNewTaskModalOpen] = useState(false);
+  const [newTask, setNewTask] = useState<Task>({
+    title: "",
+    description: "",
+    status: "",
+    subtasks: [],
+  });
+  const [newBoard, setNewBoard] = useState<Board>({
+    name: "",
+    columns: [
+      {
+        name: "",
+        tasks: [],
+      },
+    ],
+  });
 
   const onChange = (checked: boolean) => {
     //console.log(`switch to ${checked}`);
@@ -40,50 +50,61 @@ function App() {
     setIsModalOpen(true);
   };
 
-  const removeColumn = (inputIndex: number) => {
-    setNewInput(newInput.filter((input, index) => inputIndex !== index))
-  }
-
-  const AddInput = () => {
-    setNewInput([...newInput, ""])
-
-  };
-
   const handleCancel = () => {
-    setIsModalOpen(false)
-    setIsNewTaskModalOpen(false)
+    setIsModalOpen(false);
+    setIsNewTaskModalOpen(false);
   };
   useEffect(() => {
-    axios.get('https://kanban-task-server-7zl1.onrender.com/projects')
-      .then(response => {
-        setAllBoards(response.data[0].boards || [])
-
-      })
-  }, [])
+    axios.get("https://kanban-task-server-7zl1.onrender.com/projects").then((response) => {
+      setAllBoards(response.data[0].boards || []);
+    });
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+    e.preventDefault();
     if (newBoard.name.trim() === "") {
-      return alert("Board name is required!");;
+      return alert("Board name is required!");
+    }
+    if (newBoard.columns.map((column) => column.name.trim() === "")) {
+      return;
     }
     try {
-      const response = await axios.post("https://kanban-task-server-7zl1.onrender.com/projects",    { boards: [{ name: newBoard.name }] }) 
-      console.log("new board = ", response.data)
-      setNewBoard({ name: "" }); // Reset the form
+      const response = await axios.post("https://kanban-task-server-7zl1.onrender.com/projects", {
+        boards: [
+          {
+            name: newBoard.name,
+            columns: [
+              {
+                name: newBoard.columns,
+              },
+            ],
+          },
+        ],
+      });
+      console.log("new board = ", response.data);
+      setNewBoard({
+        name: "",
+        columns: [
+          {
+            name: "",
+            tasks: [],
+          },
+        ],
+      }); // Reset the form
       alert("Board created successfully!");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error creating board:", error);
       alert("Failed to create board. Please try again.");
     }
-  }
+  };
+
+  console.log(newTask)
 
   return (
-
     <div className="container">
-      {isSidebarOpen &&
-        <div className='sidebar'>
-          <div className='nav-list'>
+      {isSidebarOpen && (
+        <div className="sidebar">
+          <div className="nav-list">
             <div className="logo">
               <img src="/images/logo-light.svg" alt="logo" />
             </div>
@@ -92,16 +113,20 @@ function App() {
               <p>{`All boards (${allBoards.length})`}</p>
               {allBoards &&
                 allBoards.map((board) => {
-                  return <div key={board.name} onClick={() => setSelectedBoard(board)} className={`boards-list ${"selectedBoard.boardName" === board.name ? 'selected-board' : ''}`}>
-                    <div className='single-board'>
-                      <img src="/images/sidebarIcon.svg" alt="view board" />
-                      <p>{board.name}</p>
-
+                  return (
+                    <div
+                      key={board.name}
+                      onClick={() => setSelectedBoard(board)}
+                      className={`boards-list ${"selectedBoard.boardName" === board.name ? "selected-board" : ""}`}
+                    >
+                      <div className="single-board">
+                        <img src="/images/sidebarIcon.svg" alt="view board" />
+                        <p>{board.name}</p>
+                      </div>
                     </div>
-                  </div>
-                })
-              }
-              < div className='new-board'>
+                  );
+                })}
+              <div className="new-board">
                 <img src="/images/sidebarIcon.svg" alt="view board" height={16} />
                 <Button type="primary" onClick={showModal} ghost>
                   + Create New Board
@@ -110,28 +135,35 @@ function App() {
             </div>
           </div>
 
-          {isSidebarOpen &&
-            <div className='theme-wrapper' >
+          {isSidebarOpen && (
+            <div className="theme-wrapper">
               <div className="sidebar-btn">
-                <img src="/images/light-theme.svg" alt="light-theme" className='light' />
+                <img src="/images/light-theme.svg" alt="light-theme" className="light" />
                 <Switch defaultChecked onChange={onChange} />
-                <img src="/images/dark-theme.svg" alt="dark-theme" className='dark' />
+                <img src="/images/dark-theme.svg" alt="dark-theme" className="dark" />
               </div>
               <div className="hide-sidebar" onClick={() => setIsSidebarOpen(false)}>
                 <img src="/images/hide-icon.svg" alt="hide sidebar icon" />
                 <p>Hide Sidebar</p>
               </div>
             </div>
-          }
+          )}
         </div>
-      }
+      )}
 
-      <div className='right-div'>
+      <div className="right-div">
         <header className="header">
           <h1>{selectedBoard?.name}</h1>
-          <div className='menu-div'>
-            <button className='header-btn' onClick={() => setIsNewTaskModalOpen(true)}>+ Add New Task</button>
-            <img src="images/menu-icon.svg" alt="menu-icon" className='menu-icon' onClick={() => setHeaderModal(!headerModal)} />
+          <div className="menu-div">
+            <button className="header-btn" onClick={() => setIsNewTaskModalOpen(true)}>
+              + Add New Task
+            </button>
+            <img
+              src="images/menu-icon.svg"
+              alt="menu-icon"
+              className="menu-icon"
+              onClick={() => setHeaderModal(!headerModal)}
+            />
           </div>
         </header>
 
@@ -149,80 +181,179 @@ function App() {
             <label htmlFor="">
               <p>Subtasks</p>
               <div className="subtasks-input">
-                {newInput.map((input, index) => {
-                  return <div key={index} className="new-columns">
-                    <input value={input} />
-                    <p onClick={() => removeColumn(index)} className='removeColumn'>X</p>
-                  </div>
+                {newTask.subtasks.map((subtask, index) => {
+                  return (
+                    <div key={index} className="new-columns">
+                      <Input
+                        onChange={(e) =>
+                          setNewTask({
+                            ...newTask,
+                            subtasks: newTask.subtasks.map((_subtask) => {
+                              if (_subtask === subtask) {
+                                return {
+                                  title: e.target.value,
+                                  isCompleted: subtask.isCompleted,
+                                };
+                              } else {
+                                return _subtask;
+                              }
+                            }),
+                          })
+                        }
+                        value={subtask.title}
+                      />
+                      <p
+                        onClick={() =>
+                          setNewTask({
+                            ...newTask,
+                            subtasks: newTask.subtasks.filter((_subtask) => {
+                              if (_subtask === subtask) {
+                                return false;
+                              } else {
+                                return true;
+                              }
+                            }),
+                          })
+                        }
+                        className="removeColumn"
+                      >
+                        X
+                      </p>
+                    </div>
+                  );
                 })}
               </div>
             </label>
-            <Button type='primary' onClick={AddInput}>Add New Tasks </Button>
+            <Button
+              type="primary"
+              onClick={() =>
+                setNewTask({ ...newTask, subtasks: [...newTask.subtasks, { isCompleted: false, title: "" }] })
+              }
+            >
+              Add New Subtask
+            </Button>
             <label htmlFor="">
               <p>Status</p>
               <input />
             </label>
             <select>
-
               <option value="fruit">Todo</option>
 
               <option value="vegetable">Doing</option>
 
               <option value="meat">Done</option>
-
             </select>
-            <Button type='primary' onClick={AddInput}> Create Task </Button>
+            <Button type="primary" >
+              {" "}
+              Create Task{" "}
+            </Button>
           </form>
         </Modal>
 
-        {headerModal &&
-          <div className='headerModal'>
-            <p style={{ color: '#828FA3' }}>Edit Board</p>
-            <p style={{ color: '#EA5555' }}>Delete Board</p>
+        {headerModal && (
+          <div className="headerModal">
+            <p style={{ color: "#828FA3" }}>Edit Board</p>
+            <p style={{ color: "#EA5555" }}>Delete Board</p>
           </div>
-        }
+        )}
         <main>
-          <div className='cards-container'>
-            <Modal open={isModalOpen} onOk={AddInput} onCancel={handleCancel} cancelText={"Create Board"} okText={"Add Columns"} footer={null} >
+          <div className="cards-container">
+            <Modal
+              open={isModalOpen}
+              onCancel={handleCancel}
+              cancelText={"Create Board"}
+              okText={"Add Columns"}
+              footer={null}
+            >
               <h2>Add New Board</h2>
               <form onSubmit={handleSubmit}>
                 <label htmlFor="">
                   <p>Name</p>
-                  <Input placeholder="E.G Web Design" value={newBoard.name} onChange={(e) => setNewBoard({ ...newBoard, name: e.target.value })} required />
+                  <Input
+                    placeholder="Enter Board Name"
+                    value={newBoard.name}
+                    onChange={(e) => setNewBoard({ ...newBoard, name: e.target.value })}
+                    required
+                  />
                 </label>
                 <div>
-                  {newInput.map((newColumn, index) => {
-                    return <div key={index} className="new-columns">
-                      <Input type='text' />
-                      <p onClick={() => removeColumn(index)} className='removeColumn'>X</p>
-                    </div>
+                  {newBoard.columns.map((column, index) => {
+                    return (
+                      <div key={index} className="new-columns">
+                        <Input
+                          type="text"
+                          onChange={(e) =>
+                            setNewBoard({
+                              ...newBoard,
+                              columns: newBoard.columns.map((_column) => {
+                                if (_column === column) {
+                                  return { ...column, name: e.target.value };
+                                } else {
+                                  return _column;
+                                }
+                                // return _column === column ? { ...column, name: e.target.value } : _column;
+                              }),
+                            })
+                          }
+                          value={column.name}
+                          placeholder="Enter Column Name"
+                        />
+                        <p
+                          onClick={() =>
+                            setNewBoard({
+                              ...newBoard,
+                              columns: newBoard.columns.filter((_column) => {
+                                return _column !== column;
+                              }),
+                            })
+                          }
+                          className="removeColumn"
+                        >
+                          X
+                        </p>
+                      </div>
+                    );
                   })}
                 </div>
-                <Button type='primary' onClick={AddInput}>Add Columns</Button>
-                <button type='submit'>Create Board </button>
+                <Button
+                  type="primary"
+                  onClick={() =>
+                    setNewBoard({
+                      ...newBoard,
+                      columns: [...newBoard.columns, { name: "", tasks: [] }],
+                    })
+                  }
+                >
+                  Add Columns
+                </Button>
+                <button type="submit" className="submit-btn">
+                  Create Board{" "}
+                </button>
               </form>
             </Modal>
-            <div className='columns'>
+            <div className="columns">
               {selectedBoard?.columns.map((column, index) => {
-                return <div key={index}>
-                  <p >{column.name}</p>
-                  {column.tasks?.map((task, taskIndex) => {
-                    return <Card style={{ width: 248 }} key={index}>
-                      <h2 className='cardTitle'>{task.title}</h2>
-                    </Card>
-                  })}
-                </div>
+                return (
+                  <div key={index}>
+                    <p>{column.name}</p>
+                    {column.tasks?.map((task, taskIndex) => {
+                      return (
+                        <Card style={{ width: 248 }} key={index}>
+                          <h2 className="cardTitle">{task.title}</h2>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                );
               })}
             </div>
-
           </div>
-          {!isSidebarOpen &&
-            <button onClick={() => setIsSidebarOpen(true)} className='hidden-sidebar'>
+          {!isSidebarOpen && (
+            <button onClick={() => setIsSidebarOpen(true)} className="hidden-sidebar">
               <img src="/images/show-sidebar.svg" alt="show-icon" />
-            </button>}
-
+            </button>
+          )}
         </main>
-
       </div>
     </div>
   );
